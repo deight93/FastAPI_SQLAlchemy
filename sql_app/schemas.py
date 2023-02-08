@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 class ItemBase(BaseModel):
     title: str
@@ -33,3 +33,7 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    password: Optional[str] = None

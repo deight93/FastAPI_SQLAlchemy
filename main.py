@@ -52,6 +52,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
+    print(user_id, flush=True)
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -70,85 +71,18 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
 
+@app.delete("/users/delete/", response_model=schemas.User)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    crud.delete_user(db, user_id=user_id)
+    return Response(status_code=204)
 
-
-# from fastapi import FastAPI, Query
-# from enum import Enum
-# from pydantic import BaseModel
-# from typing import Union
-
-# app = FastAPI(title="FastAPI toy", description="Study")
-
-# class ModelName(str, Enum):
-#     alexnet = "alexnet"
-#     resnet = "resnet"
-#     lenet = "lenet"
-
-# class Item(BaseModel):
-#     name: str
-#     description: Union[str, None] = None
-#     price: float
-#     tax: Union[float, None] = None
-
-
-# fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
-
-# @app.get("/")
-# async def root1():
-#     return {"message": "Hello World"}
-
-# @app.post("/")
-# async def root2():
-#     return {"message": "Hello World"}
-
-# @app.get("/items1/{item_id1}")
-# async def read_item1(item_id1):
-#     return {"item_id1": item_id1}
-
-# @app.get("/items2/{item_id2}")
-# async def read_item2(item_id2: int):
-#     return {"item_id2": item_id2}
-
-# @app.get("/models/{model_name}")
-# async def get_model(model_name: ModelName):
-#     if model_name is ModelName.alexnet:
-#         return {"model_name": model_name, "message": "Deep Learning FTW!"}
-
-#     if model_name.value == "lenet":
-#         return {"model_name": model_name, "message": "LeCNN all the images"}
-
-#     return {"model_name": model_name, "message": "Have some residuals"}
-
-# @app.get("/files/{file_path:path}")
-# async def read_file(file_path: str):
-#     return {"file_path": file_path}
-
-# @app.get("/items3/")
-# async def read_item(skip: int = 0, limit: int = 10):
-#     return fake_items_db[skip : skip + limit]
-
-
-# @app.get("/items4/{item_id}")
-# async def read_item(item_id: str, q: Union[str, None] = None, short: bool = False):
-#     item = {"item_id": item_id}
-#     if q:
-#         item.update({"q": q})
-#     if not short:
-#         item.update(
-#             {"description": "This is an amazing item that has a long description"}
-#         )
-#     return item
-
-# @app.get("/items5/")
-# async def read_items(q: Union[str, None] = None):
-#     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-#     if q:
-#         results.update({"q": q})
-#     return results
-
-# @app.get("/items6/")
-# async def read_items(q: Union[str, None] = Query(default=None, max_length=50)):
-#     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-#     if q:
-#         results.update({"q": q})
-#     return results
+@app.patch("/users/update/{user_id}", response_model=schemas.User)
+def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(get_db)
+):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.update_user(db=db, user=user, user_id=user_id, db_user=db_user)

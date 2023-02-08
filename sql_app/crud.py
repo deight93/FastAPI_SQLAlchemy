@@ -34,3 +34,16 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def delete_user(db: Session, user_id: int):
+    db.query(models.User).filter(models.User.id == user_id).delete()
+    db.commit()
+
+def update_user(db: Session, user: schemas.UserUpdate, user_id: int, db_user: any):
+    user_data = user.dict(exclude_unset=True)
+    for key, value in user_data.items():
+        setattr(db_user, key, value)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
