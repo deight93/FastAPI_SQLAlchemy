@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 
@@ -24,16 +25,16 @@ async def db_session_middleware(request: Request, call_next):
     return response
 
 # Dependency
-def get_db(request: Request):
-    return request.state.db
+# def get_db(request: Request):
+#    return request.state.db
 
-# # Dependency
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @app.post("/users/", response_model=schemas.User)
@@ -86,3 +87,7 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return crud.update_user(db=db, user=user, user_id=user_id, db_user=db_user)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
