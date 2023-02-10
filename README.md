@@ -21,4 +21,4 @@ docker run -d --name fastapi --network docker-net -p 8000:8000 fastapi:0.1
 ```
 
 AWS EKS jenkins EC2 
-webhook SCM
+webhook SCM postgres
