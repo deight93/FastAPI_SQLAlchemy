@@ -6,8 +6,8 @@ pipeline {
        ECR_REPO = "974455589565.dkr.ecr.ap-northeast-1.amazonaws.com"
        AWS_CREDENTIALS = "ecr-token"
        REGION = "ap-northeast-1"
+       TARGET_HOST = "fast@54.95.76.21"
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -36,6 +36,18 @@ pipeline {
                     docker.withRegistry("https://${ECR_REPO}", "ecr:${REGION}:${AWS_CREDENTIALS}") {
                       docker.image("${ECR_REPO}/${NAME}:latest").push()
                     }
+                }
+            }
+        }
+
+        stage('fast api deploy') {
+            steps {        
+                sshagent (credentials: ['jenkins-ssh']) {
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop fastapi"
+                    ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm fastapi"
+                    ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker run -d --name fastapi --network docker-net -p 8000:8000 974455589565.dkr.ecr.ap-northeast-1.amazonaws.com/fastapi-test:latest"
+                """
                 }
             }
         }
