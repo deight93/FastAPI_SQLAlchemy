@@ -20,5 +20,7 @@ docker run --name postgres_db --network docker-net -p 5432:5432 -e POSTGRES_PASS
 docker run -d --name fastapi --network docker-net -p 8000:8000 fastapi:0.1 
 ```
 
-AWS EKS jenkins EC2 
-webhook SCM postgres1
+**CI/CD auto depoly**
+```
+git -> webhook -> jenkins -> gitclone -> dockerbuild -> ECR store -> sh. -> new images restart 
+```
